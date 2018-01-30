@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
+LOOOOOOOOVE YOUUUUUUUUUUUU
 //-------------------
 void* SimpleThread();
 int isDigit(char);
