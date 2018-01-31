@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-LOOOOOOOOVE YOUUUUUUUUUUUU
+
 //-------------------
 void* SimpleThread();
 int isDigit(char);
 int validateInput(char*, int);
 //-------------------
 int SharedVariable = 0; 
+pthread_barrier_t threadBarrier;
 //-------------------
 
 int main( int argc, char *argv[]){
@@ -27,6 +28,8 @@ int main( int argc, char *argv[]){
 		printf("Please enter a NUMBER greater than 0\n ");
 		return 0;
 	}
+	
+	int barrierStatus = pthread_barrier_init(&threadBarrier, NULL, result);
 
 	pthread_t myThread[result];	
 	int threads[result]; 
@@ -44,6 +47,10 @@ int main( int argc, char *argv[]){
 		pthread_join(myThread[i], NULL);
 
 	}
+
+	printf("\n*******************************\n");
+	printf("*** The Program has Ended ***\n");
+	printf("*******************************\n");
 		
 }
 
@@ -51,6 +58,7 @@ int main( int argc, char *argv[]){
 //validadeInput() takes in 2 inputs, 'input' is the value taken from the 
 //command line. 'argc' is the number of arguments.
 //(i.e. COMMAND LINE = ./program 32 | input = '32' and argc = 2)
+//It will iterate thru the string and check if the char is a digit.
 //*************************************************************************
 
 int validateInput(char* input, int argc){
@@ -75,10 +83,15 @@ int validateInput(char* input, int argc){
 
 }
 
+//*************************************************************************
+//isDigit() takes in 1 input, 'posotion'
+//command line. 'argc' is the number of arguments.
+//(i.e. COMMAND LINE = ./program 32 | input = '32' and argc = 2)
+//*************************************************************************
 int isDigit(char position)
 {
     	int number = position - 48;
-	printf("this in valid %c %d\n", position, number);
+	
 	if(number >=0 && number <= 9){
 		return 1;
 	} else {
@@ -87,10 +100,14 @@ int isDigit(char position)
 
 }
 
-void* SimpleThread (int* which){
+//*************************************************************************
 
+//*************************************************************************
+void* SimpleThread (int* which){
+	int count = 0;
 	int *limit_ptr = (int*)which;
 	int TID = *limit_ptr;
+	//TID ++;
 
 	printf("this is TID %d \n",TID);
 
@@ -101,10 +118,14 @@ void* SimpleThread (int* which){
 	
 		val = SharedVariable;
 		printf("*** thread %d sees value %d\n", TID, val);
-		SharedVariable = val +1 ;	
+		SharedVariable = val +1 ;
+		count++;	
 	}
 	
+	pthread_barrier_wait(&threadBarrier);
+
 	val = SharedVariable;
 	printf("Thread %d sees final value %d\n", TID, val);
+	//printf("Thread %d count: %d\n", TID, count);
 
 }
