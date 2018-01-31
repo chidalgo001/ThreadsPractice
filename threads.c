@@ -11,6 +11,7 @@ int validateInput(char*, int);
 //-------------------
 int SharedVariable = 0; 
 pthread_barrier_t threadBarrier;
+pthread_mutex_t threadMutex = PTHREAD_MUTEX_INITIALIZER;
 //-------------------
 
 int main( int argc, char *argv[]){
@@ -112,6 +113,7 @@ void* SimpleThread (int* which){
 	printf("this is TID %d \n",TID);
 
 	int num, val;
+pthread_mutex_lock(&threadMutex);
 	for(num = 0; num < 20; num++){
 		if(random()> RAND_MAX/2)
 			usleep(500);
@@ -121,6 +123,7 @@ void* SimpleThread (int* which){
 		SharedVariable = val +1 ;
 		count++;	
 	}
+pthread_mutex_unlock(&threadMutex);
 	
 	pthread_barrier_wait(&threadBarrier);
 
