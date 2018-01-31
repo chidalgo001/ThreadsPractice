@@ -7,26 +7,25 @@
 //-------------------
 void* SimpleThread();
 int isDigit(char);
-int validateInput(char*, int);
+int validateInput(char*[], int);
+int checkCommand(char*);
 //-------------------
 int SharedVariable = 0; 
 pthread_barrier_t threadBarrier;
 pthread_mutex_t threadMutex = PTHREAD_MUTEX_INITIALIZER;
+int PTHREAD_SYNC = 0;
 //-------------------
 
 int main( int argc, char *argv[]){
 	
-	printf("*******************************\n");
-	printf("*** The Program has Started ***\n");
-	printf("*******************************\n");
 
 	char *c;// this is basically a string
 	c = argv[1];// what is in here is a sequence of strings
 	
-	int result = validateInput(c, argc);
+	int result = validateInput(argv, argc);
 
 	if(result == 0){
-		printf("Please enter a NUMBER greater than 0\n ");
+		printf("Please enter ONE NUMBER greater than 0\n ");
 		return 0;
 	}
 	
@@ -36,9 +35,8 @@ int main( int argc, char *argv[]){
 	int threads[result]; 
 
 	for (int i = 0; i < result; i++ ){
-	 	threads[i] = i;
-		printf("this is argc: %d and this is i: %d\n" ,argc , i);
 
+	 	threads[i] = i;
 		pthread_create(&myThread[i], NULL, SimpleThread, &threads[i] );
 
 	}// end of for
@@ -49,9 +47,9 @@ int main( int argc, char *argv[]){
 
 	}
 
-	printf("\n*******************************\n");
+	printf("\n-----------------------------\n");
 	printf("*** The Program has Ended ***\n");
-	printf("*******************************\n");
+	printf("-----------------------------\n");
 		
 }
 
@@ -62,9 +60,18 @@ int main( int argc, char *argv[]){
 //It will iterate thru the string and check if the char is a digit.
 //*************************************************************************
 
-int validateInput(char* input, int argc){
+int validateInput(char* argv[], int argc){
 
-	if(argc != 2)
+	char* input = argv[1];
+	char* status = "";
+	int indicator;
+
+	if(argc == 3){
+		char* command = argv[2];
+		indicator = checkCommand(command);
+	}
+
+	if(argc > 3 || indicator == -1)
 		return 0;
 
 	int length = strlen(input);
@@ -78,14 +85,46 @@ int validateInput(char* input, int argc){
 			return 0;
 	}
 
+	if(indicator == 1){
+		status = "SYNC";	
+	}else{
+		status = "NORMAL";
+	}
+
+	printf("-------------------------------\n");
+	printf("*** Program mode: %s ***\n", status);
+	printf("-------------------------------\n");
+	sleep(2);
+
 	int result = atoi((char*)input);
 
 	return result;
 
 }
 
+int checkCommand(char* command){
+	
+	if(command[0] != '-'){
+		return -1;
+	}
+	else if(command[0]=='-' && command[1]=='s' && strlen(command)==2){
+		PTHREAD_SYNC = 1;
+	}
+	else{
+
+		printf("\n**NOTE: %s is NOT a valid command.\n", command);
+		printf("Program will execute in 'normal' mode.\n\n");
+		sleep(3);
+		return 0;
+	}
+
+	
+	return 1;			
+
+}
+
 //*************************************************************************
-//isDigit() takes in 1 input, 'posotion'
+//isDigit() takes in 1 input, 'position'
 //command line. 'argc' is the number of arguments.
 //(i.e. COMMAND LINE = ./program 32 | input = '32' and argc = 2)
 //*************************************************************************
@@ -105,28 +144,34 @@ int isDigit(char position)
 
 //*************************************************************************
 void* SimpleThread (int* which){
+
 	int count = 0;
 	int *limit_ptr = (int*)which;
 	int TID = *limit_ptr;
-	//TID ++;
-
-	printf("this is TID %d \n",TID);
 
 	int num, val;
-pthread_mutex_lock(&threadMutex);
+
 	for(num = 0; num < 20; num++){
+
 		if(random()> RAND_MAX/2)
 			usleep(500);
+
+		if(PTHREAD_SYNC == 1)
+			pthread_mutex_lock(&threadMutex);
 	
 		val = SharedVariable;
 		printf("*** thread %d sees value %d\n", TID, val);
 		SharedVariable = val +1 ;
 		count++;	
-	}
-pthread_mutex_unlock(&threadMutex);
-	
-	pthread_barrier_wait(&threadBarrier);
 
+		if (PTHREAD_SYNC == 1)
+			pthread_mutex_unlock(&threadMutex);
+	
+	}
+
+	if (PTHREAD_SYNC == 1)
+		pthread_barrier_wait(&threadBarrier);
+	
 	val = SharedVariable;
 	printf("Thread %d sees final value %d\n", TID, val);
 	//printf("Thread %d count: %d\n", TID, count);
