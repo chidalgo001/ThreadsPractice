@@ -6,13 +6,14 @@ The threads are to access a shared variable and add 1 to it and finally display 
 If PTHREADS_SYNC is defined, the threads will be synchronized. otherwise threads will not be.
 
 USE THE MAKEFILE TO EXECUTE AND RUN THE PROGRAM.
-# NOTE: all the files need to be in the same dirctory in order to work properly.
+**NOTE: all the files need to be in the same dirctory in order to work properly.**
 
-# To JUST build the program. (This will prompt you to build the program with PTHREAD_SYNC defined or not)
+**To JUST build the program.**
+(This will prompt you to build the program with PTHREAD_SYNC defined or not)
 ```
 $ make build
 ```
-# To BUILD and EXECUTE the program.
+**To BUILD and EXECUTE the program.**
 (This will prompt you to build the program with PTHREAD_SYNC defined or not).
 (ALSO this will prompt you the number of threads to execute in the program).
 ```
@@ -26,7 +27,7 @@ $ Threads to run:
 ```
 NOTE: If you enter anything other than 'y' or 'n' when prompt for PTHREAD_SYNC, default value will be 'n'
 
-# To clean 
+**To clean** 
 ```
 $ make clean
 ```
