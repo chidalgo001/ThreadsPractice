@@ -27,7 +27,7 @@ $ Threads to run:
 ```
 NOTE: If you enter anything other than 'y' or 'n' when prompt for PTHREAD_SYNC, default value will be 'n'
 
-**To clean** 
+**To clean** (This will delete the executable file created)
 ```
 $ make clean
 ```
