@@ -31,3 +31,9 @@ NOTE: If you enter anything other than 'y' or 'n' when prompt for PTHREAD_SYNC, 
 ```
 $ make clean
 ```
+
+### Bug:
+```
+When running $ make clean, it prompts the user to define PTHREADS_SYNC, dont know to
+stop that from prompting during clean.
+```
